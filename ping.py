@@ -50,14 +50,59 @@ def mymap():
     
     # print sensorKeys
     
+    
+    legendURL='http://pvos.org/surata/legend.json'
+    response=urllib2.urlopen(legendURL)
+    legends=json.load(response)
+    print legends
+    
+    
+    locationURL='https://data.sparkfun.com/output/YGVpwKbW12FvZpOZ6xab.json'
+    response=urllib2.urlopen(locationURL)
+    data=json.load(response)
+    sensorIDs=[]
+    
+    for i in range(0,len(data)):
+        reading=data[i]
+        sensorIDs.append(reading['sensorid'])
+    sensorIDs=list(set(sensorIDs))
+    print 'sensorIDs=',sensorIDs
+    
+    locations=[]
+    sensorIndex=0
+    while sensorIndex<len(sensorIDs):
+        thisID=sensorIDs[sensorIndex]
+        #now go through data until get a match
+        match=False
+        i=0
+        while match==False:
+            thisLoc=data[i]
+            possMatch=thisLoc['sensorid']
+            if possMatch==thisID:
+                lat=thisLoc['lat']
+                lon=thisLoc['lon']
+                locations.append([thisID,lat,lon])
+                match=True
+            i=i+1
+        sensorIndex=sensorIndex+1
+        
+    print "locations=",locations
+        
+    
     points=[]
     
-    
-   # for key in sensorKeys:
-    for i in range(0,len(sensorKeys)):
-        key=sensorKeys[i]
-        lat=sensorLats[i]
-        lon=sensorLons[i]
+    for sensorID in sensorIDs:
+        print "sensorID=",sensorID
+        # find key
+        for legend in legends:
+            print "legend=", legend['sensorID']
+            if legend['sensorID']==sensorID:
+                key=legend['phantKey']
+        # find lat and lon
+        for location in locations:
+            if location[0]==sensorID:
+                lat=location[1]
+                lon=location[2]
         phantURL='https://data.sparkfun.com/output/'+key+'.json?page=1'
         #print phantURL
         response=urllib2.urlopen(phantURL)
@@ -65,17 +110,20 @@ def mymap():
         data=json.load(response)
         last_reading=data[0]
         temp=float(last_reading['temp'])
-        timeBits=last_reading['timestamp'].split('T')[1].split(':')
-        hour=timeBits[0]+':'+timeBits[1]
-         #print hour
-        date=last_reading['timestamp'].split('T')[0]
-    
         batt=float(last_reading['batt'])
         conduct=float(last_reading['conduct'])
-        point=[key,lat,lon,temp,batt,conduct, date, hour]
+        timeBits=last_reading['timestamp'].split('T')[1].split(':')
+        hour=timeBits[0]+':'+timeBits[1]
+        #print hour
+        date=last_reading['timestamp'].split('T')[0]
+        #print date
+        point=[key,lat,lon,temp,batt,conduct,date,hour]
         points.append(point)
+    
+    print "new points=",points
         
-    print points
+        
+   # for key in sensorKeys:
     
     phantKey='QGXKjpvEpWH268W1NvWD'
     phantURL='https://data.sparkfun.com/output/'+phantKey+'.json?page=1'

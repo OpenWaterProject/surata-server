@@ -63,9 +63,16 @@
 				for(i=0; i<pointsArray.length; i++){
 					var myPoint = pointsArray[i];
 					
+					//var link = $('<a href="#" class="speciallink">TestLink</a>').click(function() {alert("test");})[0];
+
 					var marker = new L.marker([myPoint[1], myPoint[2]]).addTo(map)
-				    .bindPopup("Temp = "+myPoint[3]+"C and conductivity = "+myPoint[5]+"Hz at "+myPoint[7]+" on "+myPoint[6]).openPopup();
+					.bindPopup("Temp = "+myPoint[3]+"C and conductivity = "+myPoint[5]+"Hz at "+myPoint[7]+" on "+myPoint[6]).openPopup();
 				    
+				    
+				    //var marker = new L.marker([myPoint[1], myPoint[2]]).addTo(map)
+				    //.bindPopup($('<a href="#" class="speciallink">TestLink</a>').click(function() {alert("test");})[0]);
+				    
+				  
 				    markers.push([myPoint[1], myPoint[2]]);
 				}
 				
